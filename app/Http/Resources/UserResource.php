@@ -37,7 +37,10 @@ class UserResource extends JsonResource
             //'permissions' => $request->user()->getPermissionsViaRoles()->pluck('name'),
             //'deleted_at' => $this->deleted_at,
             // questo mi serve per passare il LabelField al v-select nel frontend per poter vedere nome e cognome nella select.
-            "complete_name" => $this->lastname . " " . $this->name
+            "complete_name" => $this->surname . " " . $this->name,
+            'date_of_last_checkin' => $this->getRoleNames()->first() == "Staff" ? $this->lastCheckIn() : null,
+            'date_of_last_checkout' => $this->getRoleNames()->first() == "Staff" ? $this->lastCheckOut() : null,
+
         ];
     }
 }

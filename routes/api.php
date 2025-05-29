@@ -16,7 +16,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
     //USERS
     Route::get('/users', [UserController::class, 'index']);
+    Route::get('/users/{user}', [UserController::class, 'show']);
+    Route::put('/users/{user}', [UserController::class, 'update']);
+    Route::delete('users/{user}', [UserController::class, 'delete']);
     Route::post('/users', [UserController::class, 'store']);
+    Route::put('users/{user}/update-password', [UserController::class, 'updatePassword']);
 
     //BADGE
     Route::post('/check-in', [BadgeController::class, 'checkIn']);
