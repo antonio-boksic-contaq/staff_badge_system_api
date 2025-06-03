@@ -25,8 +25,10 @@ Route::middleware('auth:sanctum')->group(function () {
     //BADGE
     Route::post('/check-in', [BadgeController::class, 'checkIn']);
     Route::post('/check-out', [BadgeController::class, 'checkOut']);
+    Route::put('/late-check-out', [BadgeController::class, 'lateCheckOut']);
     Route::post('/create-note', [BadgeController::class, 'createNote']);
     Route::get('/get-time-logs', [BadgeController::class, 'getTimeLogs']);
     // Route::middleware('role:Admin')->get('/getAllPunches', [BadgeController::class, 'index']);
     Route::get('/getAllPunches', [BadgeController::class, 'index']);
+    route::put('/convalidate-punch', [BadgeController::class, 'convalidatePunch']); //TODO questa devo renderla accessibile solo ad admin
   });

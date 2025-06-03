@@ -60,7 +60,7 @@ public function store(UserRequest $request)
     ]);
 
 
-    $user->assignRole('staff');
+    $user->assignRole('Staff');
 
     return response()->json(new UserResource($user));
 }

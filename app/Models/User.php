@@ -40,12 +40,24 @@ class User extends Authenticatable
 
     public function lastCheckIn()
     {
-        return "2025-05-27";
+        $last = $this->punches()
+        ->whereNotNull('check_in')
+        ->orderByDesc('check_in')
+        ->first();
+
+        return $last ? \Carbon\Carbon::parse($last->check_in)->toDateString() : null;
+        // return "2025-05-27";
     }
 
         public function lastCheckOut()
     {
-        return "2025-05-27";
+        $last = $this->punches()
+        ->whereNotNull('check_out')
+        ->orderByDesc('check_out')
+        ->first();
+
+         return $last ? \Carbon\Carbon::parse($last->check_out)->toDateString() : null;
+        // return "2025-05-26";
     }
 
     
