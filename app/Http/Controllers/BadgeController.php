@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Models\Punch;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\PunchesExport;
 
 
 class BadgeController extends Controller
@@ -13,6 +15,8 @@ class BadgeController extends Controller
 
     //questa sarebbe /getAllPunches
     public function index(Request $request){
+
+        // dd($request);
 
             $date = $request->input('date') ?? Carbon::today()->toDateString();
 
@@ -52,17 +56,30 @@ class BadgeController extends Controller
                 $query->where('punches.co_accepted', 0);
             }
 
-            $timeLogs = $query->get();
+            if ($request->has('startDate')) {
+                $query->whereDate('check_in', '>=', $request->startDate);
+            }
+
+            if ($request->has('endDate')) {
+                $query->whereDate('check_in', '<=', $request->endDate);
+            }
+
+            $punches = $query->get();
+
+            if($request->has('export')) {
+                // dd("è stato richiesto export");
+                 return Excel::download(new PunchesExport($punches), 'timbrature.xlsx');
+            }
 
             if ($request->has('exactDate')) {
-                $timeLogs->transform(function ($item) {
+                $punches->transform(function ($item) {
                 $item->check_in = $item->check_in ? Carbon::parse($item->check_in)->format('H:i:s') : null;
                 $item->check_out = $item->check_out ? Carbon::parse($item->check_out)->format('H:i:s') : null;
                 return $item;
                 });
             }
 
-        return response()->json($timeLogs);
+        return response()->json($punches);
     }
 
 
