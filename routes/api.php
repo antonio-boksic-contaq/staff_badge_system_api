@@ -7,6 +7,8 @@ use Illuminate\Auth\Events\Login;
 
 
 route::post('/login', [LoginController::class, 'login']);
+Route::post('auth/password-recovery', [LoginController::class, 'passwordRecovery']);
+
 
 // rotte protette
 Route::middleware('auth:sanctum')->group(function () {

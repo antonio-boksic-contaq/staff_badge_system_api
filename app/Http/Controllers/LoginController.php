@@ -36,19 +36,24 @@ class LoginController extends Controller
         return response()->json(['success' => true], 200);
     }
 
-    // public function passwordRecovery(Request $request){
-    //     $request->validate(
-    //       ['email' => 'required|exists:users,email,deleted_at,NULL'],
-    //       [
-    //         'email.required' => 'L\'indirizzo email è obbligatorio',
-    //         'email.exists' => 'Non abbiamo trovato nessun utente con questa email',
-    //       ]
-    //     );
-    //     $newPassword = Str::upper(Str::random(8));
-    //     $user = User::where('email',$request->get('email'))->first();
-    //     $user->update(['password' => Hash::make($newPassword)]);
-    //     Mail::to($user->email)->send(new PasswordRecovery($user, $newPassword));
+    public function passwordRecovery(Request $request){
+        $request->validate(
+          ['email' => 'required|exists:users,email,deleted_at,NULL'],
+          [
+            'email.required' => 'L\'indirizzo email è obbligatorio',
+            'email.exists' => 'Non abbiamo trovato nessun utente con questa email',
+          ]
+        );
+        $newPassword = Str::upper(Str::random(8));
+        $user = User::where('email',$request->get('email'))->first();
+        $user->update(['password' => Hash::make($newPassword)]);
+        // Mail::to($user->email)->send(new PasswordRecovery($user, $newPassword));
+        try {
+    Mail::to($user->email)->send(new PasswordRecovery($user, $newPassword));
+} catch (\Exception $e) {
+    logger()->error('Errore invio mail: ' . $e->getMessage());
+}
     
-    //     return response()->json(['success' => true], 200);
-    // }
+        return response()->json(['success' => true], 200);
+    }
 }
