@@ -43,7 +43,7 @@
   <p>
     Ciao {{ $user->name }}, la procedura per il recupero delle credenziali è andata a buon fine.
     <br />
-    Utilizza le seguenti credenziali per accedere al di timbratura digitale.
+    Utilizza le seguenti credenziali per accedere al software di timbratura digitale.
   </p>
   <blockquote>
     <ul class="text-center list-style-none">
