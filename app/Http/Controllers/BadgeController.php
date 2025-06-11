@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NotConvalidatedPunchCreated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -34,7 +35,8 @@ class BadgeController extends Controller
                 'users.surname',
                 'punches.check_in',
                 'punches.check_out',
-                'punches.notes'
+                'punches.notes',
+                'punches.co_accepted'
             );
 
             // se richiesta viene effettuata da Staff gli passo solo i dati del relativo utente
@@ -117,8 +119,8 @@ class BadgeController extends Controller
     //     // return response()->json(['message' => 'Check-in registrato.']);
     // }
 
-    public function checkIn(Request $request)
-{
+    public function checkIn(Request $request){
+        
     $user = $request->user();
     $today = now()->startOfDay();
 
@@ -192,24 +194,28 @@ class BadgeController extends Controller
 
     public function lateCheckOut(Request $request){
         // dd($request->all());
-      $punch =   Punch::where('user_id', $request->user()->id)
+        $punch =   Punch::where('user_id', $request->user()->id)
         ->whereNotNull('check_in')
         ->whereNull('check_out')
         ->orderByDesc('check_in')
         ->first();
 
-    // Prende solo la data (Y-m-d) dal check_in esistente
-    $checkInDate = Carbon::parse($punch->check_in)->toDateString(); // es. "2025-06-01"
+        // Prende solo la data (Y-m-d) dal check_in esistente
+        $checkInDate = Carbon::parse($punch->check_in)->toDateString(); // es. "2025-06-01"
 
-    // Combina la data del check-in con l'orario ricevuto
-    $checkOutDateTime = Carbon::createFromFormat('Y-m-d H:i', $checkInDate . ' ' . $request->time);
+        // Combina la data del check-in con l'orario ricevuto
+        $checkOutDateTime = Carbon::createFromFormat('Y-m-d H:i', $checkInDate . ' ' . $request->time);
 
-        // Aggiorna i campi
-    $punch->check_out = $checkOutDateTime;
-    $punch->co_accepted = 0;
-    $punch->save();
+            // Aggiorna i campi
+        $punch->check_out = $checkOutDateTime;
+        $punch->co_accepted = 0;
+        $punch->save();
 
-    return response()->json(['message' => 'Late check-out registrato con successo.']);
+    
+        event(new NotConvalidatedPunchCreated());
+    
+
+        // return response()->json(['message' => 'Late check-out registrato con successo.']);
 
 
         return $punch;
@@ -221,10 +227,10 @@ class BadgeController extends Controller
         ->first();
 
             $punch->ci_accepted = 1;
-    $punch->co_accepted = 1;
-    $punch->save();
+        $punch->co_accepted = 1;
+        $punch->save();
 
-    return response()->json(['message' => 'Punch convalidato con successo.']);
+        return response()->json(['message' => 'Punch convalidato con successo.']);
 
         // dd($punch);
     }
