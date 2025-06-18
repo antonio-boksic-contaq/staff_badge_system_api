@@ -9,6 +9,8 @@ use Carbon\Carbon;
 use App\Models\Punch;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\PunchesExport;
+use App\Mail\LateCheckOutNotificationMail;
+use Illuminate\Support\Facades\Mail;
 
 
 class BadgeController extends Controller
@@ -193,7 +195,7 @@ class BadgeController extends Controller
     }
 
     public function lateCheckOut(Request $request){
-        // dd($request->all());
+         // dd($request->user()->id);
         $punch =   Punch::where('user_id', $request->user()->id)
         ->whereNotNull('check_in')
         ->whereNull('check_out')
@@ -212,8 +214,11 @@ class BadgeController extends Controller
         $punch->save();
 
     
-        event(new NotConvalidatedPunchCreated());
-    
+        // questo mi servirebbe per gestire eventi tramite websockets ma non riesco a configurare macchina...
+        // event(new NotConvalidatedPunchCreated());
+        //TODO disattivato websockets, Lucia dice che vuole ricevere mail piuttosto che notifica in app
+        Mail::to('lucia.cofini@contaq.it')->send(new LateCheckOutNotificationMail($punch));
+
 
         // return response()->json(['message' => 'Late check-out registrato con successo.']);
 
